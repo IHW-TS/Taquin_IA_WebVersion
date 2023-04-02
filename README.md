@@ -10,7 +10,7 @@ En raison d'un manque de temps, certaines améliorations n'ont pas pu être appo
 
 Utiliser plusieurs heuristiques pour résoudre le problème du Taquin et étudier leurs performances.
 
-- Augmenter la taille du Taquin en 4x4, 5x5 => réfléchir aux meilleures heuristiques adaptées.
+- Augmenter la taille du Taquin en 4x4, 5x5 (ca devient compliqué), etc... => réfléchir aux meilleures heuristiques adaptées.
 - Expérimenter avec d'autres heuristiques et différentes distances.
 
 ## Version Python
