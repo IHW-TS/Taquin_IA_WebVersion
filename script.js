@@ -1,3 +1,13 @@
+const heuristicsData = {
+    1: { totalExecutionTime: 0, totalCpuTime: 0, totalStatesExplored: 0, executionCounter: 0 },
+    2: { totalExecutionTime: 0, totalCpuTime: 0, totalStatesExplored: 0, executionCounter: 0 },
+    3: { totalExecutionTime: 0, totalCpuTime: 0, totalStatesExplored: 0, executionCounter: 0 },
+    4: { totalExecutionTime: 0, totalCpuTime: 0, totalStatesExplored: 0, executionCounter: 0 },
+    5: { totalExecutionTime: 0, totalCpuTime: 0, totalStatesExplored: 0, executionCounter: 0 },
+    6: { totalExecutionTime: 0, totalCpuTime: 0, totalStatesExplored: 0, executionCounter: 0 },
+};
+let executionCounter = 0;
+
 
 class Taquin {
     constructor(state, parent = null, move = null, g = 0) {
@@ -199,7 +209,7 @@ function generateStates(size) {
 
 
 function runTaquin(event) {
-    event.preventDefault(); // Ajoutez cette ligne pour empêcher le rafraîchissement de la page
+    event.preventDefault();
 
     const size = parseInt(document.getElementById("size").value);
     const heuristic = parseInt(document.getElementById("heuristic").value);
@@ -212,16 +222,37 @@ function runTaquin(event) {
     const executionTime = performance.now() - startTime;
 
     if (solution) {
+        executionCounter++;
+
+        // Mettre à jour les totaux pour l'heuristique sélectionnée
+        heuristicsData[heuristic].totalExecutionTime += executionTime;
+        heuristicsData[heuristic].totalCpuTime += performance.now() - startTime;
+        heuristicsData[heuristic].totalStatesExplored += numExplored;
+        heuristicsData[heuristic].executionCounter++;
+
+        // Calculer les moyennes pour l'heuristique sélectionnée
+        const averageExecutionTime = heuristicsData[heuristic].totalExecutionTime / heuristicsData[heuristic].executionCounter;
+        const averageCpuTime = heuristicsData[heuristic].totalCpuTime / heuristicsData[heuristic].executionCounter;
+        const averageStatesExplored = heuristicsData[heuristic].totalStatesExplored / heuristicsData[heuristic].executionCounter;
+
+        // Afficher les résultats
         document.getElementById("numExplored").innerText = `${numExplored}`;
         document.getElementById("numMoves").innerText = `${solution.length}`;
         document.getElementById("heuristicSolution").innerText = /*h${heuristic}:*/ `${solution.join(" ")}`;
         document.getElementById("executionTime").innerText = `${executionTime.toFixed(2)} ms`;
         document.getElementById("cpuTime").innerText = `${(performance.now() - startTime).toFixed(2)} ms`;
 
+        // Afficher les moyennes
+        document.getElementById("averageExecutionTime").innerText = `${averageExecutionTime.toFixed(2)} ms`;
+        document.getElementById("averageCpuTime").innerText = `${averageCpuTime.toFixed(2)} ms`;
+        document.getElementById("averageStatesExplored").innerText = `${averageStatesExplored.toFixed(2)}`;
+
         printTaquin("finalState", finalState);
         updateChart(numExplored, heuristic, executionTime);
     }
 }
+
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const runButton = document.getElementById("runButton");
@@ -327,27 +358,50 @@ function toggleVisibility(containerId) {
 let resultChart;
 
 function updateChart(numExplored, heuristic, executionTime) {
+    const averageExecutionTime = (heuristicsData[heuristic].totalExecutionTime / heuristicsData[heuristic].executionCounter).toFixed(2);
+    const averageStatesExplored = (heuristicsData[heuristic].totalStatesExplored / heuristicsData[heuristic].executionCounter).toFixed(2);
+    const averageCpuTime = (heuristicsData[heuristic].totalCpuTime / heuristicsData[heuristic].executionCounter).toFixed(2);
+  
+
     if (!resultChart) {
         const chartElement = document.getElementById("resultChart");
+
+
         resultChart = new Chart(chartElement, {
             type: "bar",
             data: {
                 labels: ["h1", "h2", "h3", "h4", "h5", "h6"],
                 datasets: [
                     {
-                        label: "Nombre d'états explorés",
+                        label: " Moyenne Nombre d'états explorés",
                         data: [0, 0, 0, 0, 0, 0],
                         backgroundColor: "rgba(75, 192, 192, 0.2)",
                         borderColor: "rgba(75, 192, 192, 1)",
                         borderWidth: 1,
                     },
                     {
-                        label: "Temps d'exécution (ms)",
+                        label: "Moyenne Temps d'exécution (ms)",
                         data: [0, 0, 0, 0, 0, 0],
                         backgroundColor: "rgba(255, 99, 132, 0.2)",
                         borderColor: "rgba(255, 99, 132, 1)",
                         borderWidth: 1,
                     },
+                    {
+                        label: 'Moyenne Temps CPU (ms)',
+                        data: [],
+                        borderColor: 'rgba(144,238,144,1)',
+                        backgroundColor: 'rgba(144,238,144,0.2)',
+                        borderWidth: 1,
+                    }
+                    /*{
+                        label: 'Moyenne (ms)',
+                        data: [],
+                        borderColor: 'rgba(218, 112, 214, 1)',
+                        backgroundColor: 'rgba(238, 130, 238, 0.2)',
+                        borderWidth: 1,
+                    }*/
+                    
+                    
                 ],
             },
             options: {
@@ -360,8 +414,13 @@ function updateChart(numExplored, heuristic, executionTime) {
         });
     }
 
-    resultChart.data.datasets[0].data[heuristic - 1] = numExplored;
-    resultChart.data.datasets[1].data[heuristic - 1] = executionTime;
-    resultChart.update();
-}
+   /* resultChart.data.datasets[0].data[heuristic - 1] = numExplored;*/
+   resultChart.data.datasets[0].data[heuristic - 1] = averageStatesExplored;
+   resultChart.data.datasets[1].data[heuristic - 1] = averageExecutionTime;
+   resultChart.data.datasets[2].data[heuristic - 1] = averageCpuTime;
+   
+   resultChart.update();
+   
 
+   
+}
