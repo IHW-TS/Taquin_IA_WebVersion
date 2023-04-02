@@ -4,7 +4,6 @@ import time # Import du module time pour mesurer le temps d'exécution
 import os # Import du module os pour mesurer le temps CPU
 from random import shuffle
 
-# Définition de la classe Taquin
 class Taquin:
     # Initialisation d'un objet Taquin avec une configuration (état), un parent (état précédent),
     # un mouvement (dernier mouvement effectué) et le coût total pour atteindre cet état
@@ -90,27 +89,56 @@ def solve_taquin(initial_state, final_state, heuristic):
             while current.parent is not None: # Tant qu'il y a des parents
                 solution.appendleft(current.move) # Ajout du mouvement à la liste
                 current = current.parent # Passage au parent suivant
-            return solution, num_explored # Retourne la liste des mouvements et le nombre d'états explorés
+            return solution, num_explored 
 
         explored.add(tuple(map(tuple, current.state))) # Ajout de l'état courant à l'ensemble des états explorés
-        num_explored += 1 # Incrémentation du nombre d'états explorés
+        num_explored += 1 
 
         for neighbor in current.get_neighbors(): # Pour chaque voisin de l'état courant
             if tuple(map(tuple, neighbor.state)) not in explored: # Si le voisin n'a pas déjà été exploré
                 heapq.heappush(frontier, (neighbor.f(heuristic), neighbor)) # Ajout du voisin à la file de priorité avec le coût mis à jour
 
-    return None, num_explored # Retourne None si la solution n'a pas été trouvée, sinon la liste des mouvements et le nombre d'états explorés
-
+    return None, num_explored
 
 def generate_random_state(size):
+    # Crée une liste contenant des entiers allant de 0 à size*size-1, inclus
     state = list(range(size * size))
+    # Mélange les entiers de manière aléatoire
     shuffle(state)
+    # Regroupe les entiers en sous-listes de taille size pour former une matrice carrée
     return [state[i * size:(i + 1) * size] for i in range(size)]
 
+def is_valid_state(state):
+
+    size = len(state) # Taille de l'état (nombre de rangées)
+    flat_state = [cell for row in state for cell in row] # Convertit l'état 2D en une liste à plat
+
+    expected_state = list(range(size * size)) # Crée l'état cible avec toutes les cases en ordre croissant
+    expected_state[-1] = 0 # La dernière case doit être vide
+
+    inversions = 0 # Compteur d'inversions (paires de cases mal placées)
+
+    # Parcourt chaque case de l'état à plat
+    for i, cell in enumerate(flat_state):
+        # Compare la case avec toutes les cases suivantes
+        for j in range(i + 1, size * size):
+            # Vérifie si la case suivante est plus petite et non vide
+            if flat_state[j] and flat_state[j] < cell:
+                inversions += 1 # Incrémente le compteur d'inversions
+
+    if size % 2 == 1: # Si la taille de l'état est impaire
+        return inversions % 2 == 0 # Retourne vrai si le nombre d'inversions est pair, faux sinon
+    else: # Si la taille de l'état est paire
+        empty_row = next(i for i, row in enumerate(state) if 0 in row) # Trouve la rangée de la case vide
+        return (inversions + empty_row) % 2 == 1 # Retourne vrai si le nombre d'inversions plus la rangée de la case vide est impair, faux sinon
+
+# Fonction pour générer un état de Taquin valide de taille "size"
 def generate_states(size):
-    initial_state = generate_random_state(size)
-    final_state = [[(i * size + j + 1) % (size * size) for j in range(size)] for i in range(size)]
-    return initial_state, final_state
+    initial_state = generate_random_state(size) # Génère un état initial aléatoire
+    while not is_valid_state(initial_state): # Tant que l'état n'est pas valide
+        initial_state = generate_random_state(size) # Génère un nouvel état initial aléatoire
+    final_state = [[(i * size + j + 1) % (size * size) for j in range(size)] for i in range(size)] # Génère l'état final
+    return initial_state, final_state 
 
 # Fonction pour afficher l'état actuel du Taquin
 def print_taquin(state):
@@ -119,7 +147,6 @@ def print_taquin(state):
     print()
 
 if __name__ == "__main__":
-    # Demande à l'utilisateur la taille du Taquin
     size = int(input("Veuillez entrer la taille du taquin (par exemple, 3 pour un taquin 3x3): "))
     
     # Génère un état initial et final de Taquin de la taille demandée
@@ -160,7 +187,6 @@ if __name__ == "__main__":
                 if neighbor.move == move:
                     taquin_instance = neighbor # Change l'état du Taquin à l'état du voisin
                     break
-        print_taquin(taquin_instance.state) # Affiche l'état final du Taquin
-
-    else: # Si aucune solution n'a été trouvée
-        print(f"Pas de solution trouvée pour heuristique h{heuristic}.") # Affiche un message d'erreur
+        print_taquin(taquin_instance.state) 
+    else: 
+        print(f"Pas de solution trouvée pour heuristique h{heuristic}.") 
