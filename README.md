@@ -1,6 +1,6 @@
-#Taquin_Game_IA
+# Taquin_Game_IA
 
-##Version Web
+## Version Web
 
 En raison d'un manque de temps, certaines améliorations n'ont pas pu être apportées à la version web :
 
@@ -13,6 +13,6 @@ Utiliser plusieurs heuristiques pour résoudre le problème du Taquin et étudie
 - Augmenter la taille du Taquin en 4x4, 5x5 => réfléchir aux meilleures heuristiques adaptées.
 - Expérimenter avec d'autres heuristiques et différentes distances.
 
-##Version Python
+## Version Python
 
 - Le programme fonctionne correctement avec l'utilisation de l'algorithme A* pour une taille de 3x3.
