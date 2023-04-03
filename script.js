@@ -511,3 +511,4 @@ function updateChart(numExplored, heuristic, executionTime) {
 
    
 }
+ 
